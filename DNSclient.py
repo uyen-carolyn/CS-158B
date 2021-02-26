@@ -25,9 +25,9 @@ def resolve(server, query):
 	parts = query.split('.')
 
 # IDENTIFY QUERY AS IP ADDRESS OR DOMAIN NAME TO BE RESOLVED.
-# IF CONDITION HANDLES IP ADDRESS. ELSE CONDITION HANDLES DOMAIN NAME.
+# IF CONDITION HANDLES IP ADDRESS. 
 	if query.replace('.', '').isnumeric():
-		parts.reverse()
+		parts.reverse()	# kudos to Miamia for explaining the reasoning behind reversing the query
 		parts.append("in-addr")
 		parts.append("arpa")
 
@@ -41,7 +41,6 @@ def resolve(server, query):
 		rsp = sd.recv(1024)
 
 		(id, flags, qcnt, acnt, ncnt, mcnt) = struct.unpack('!HHHHHH', rsp[0:12])
-		# print(f'id = {id}, flags = {flags:b}, qcnt = {qcnt}, acnt = {acnt}, ncnt = {ncnt}, mcnt = {mcnt}')
 
 		# VERIFY IF IP ADDRESS EXISTS
 		if acnt == 0:	# kudos to Miamia for explaining the meaning of acnt's value at zero
@@ -50,9 +49,7 @@ def resolve(server, query):
 
 			resolved_domain = rsp[57:len(rsp) - 5].decode()
 			resolved_domain += "." + rsp[len(rsp) - 4: len(rsp)].decode()
-			print("Domain name: ")
-			print(" - "  + resolved_domain)
-			"""
+
 			r = rsp[-40:]
 			for i in range(0, acnt):	# kudos to auk for explaining how formatting byte to ipv4 works
 				extracted = r[-4:]	# ip is four values of up to four divided by a period
@@ -60,8 +57,7 @@ def resolve(server, query):
 				rsp_reverse = ".".join(rsp_reverse)
 				print(" - " + rsp_reverse)
 				r = r[:len(r)-16] # to only get ip at the end
-			"""
-
+# ELSE CONDITION HANDLES DOMAIN NAME.
 	else:
 		q = b''
 		for p in parts:
